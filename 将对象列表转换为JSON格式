@@ -1,0 +1,68 @@
+1.	 引入json-lib.jar
+Maven引入：
+<!-- https://mvnrepository.com/artifact/net.sf.json-lib/json-lib -->
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+2.	 将对象封住在list中，然后调用JSONArray.fromatObject(list)，将list转为json字符串格式，然后通过将转换完成的对象放入JSONObject.put(key,value)。将最终的封住完的对象放入response中。
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.benas.Person;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.setContentType("application/json;charset=utf-8");
+		PrintWriter out=response.getWriter();
+		Person p=new Person();
+		p.setId(1);
+		p.setName("hello");
+		Person p2=new Person();
+		p2.setId(2);
+		p2.setName("world");
+		
+		JSONObject jo=new JSONObject();
+		List<Person> list=new ArrayList<>();
+		list.add(p2);
+		list.add(p);
+		JSONArray ja=JSONArray.fromObject(list);
+		jo.put("persons", ja);
+		out.println(jo);
+		
+	}
+
+3.	 在jsp页面ajax返回函数data，接受的是一个object对象。首先将对象转为字符串格式var str = JSON.stringify(data);，然后定义个数组（非列表）var v=data.key值,最后用for循环打印。
+//页面每隔3s执行一次
+<script type="text/javascript" language="javascript">  
+    $(document).ready(function () {  
+    	
+        setInterval("startRequest()", 3000);  
+    });  
+    function startRequest() {  
+         
+
+	$('#show_2').text((new Date()).toLocaleDateString() + " " + (new Date
+
+		()).toLocaleTimeString());
+
+		$.post('load', function(data) {
+			console.log(data);			
+			var str = JSON.stringify(data);
+			console.log(str);
+			var person=data.persons;
+			for(var i=0;i<person.length;i++){
+				var p=person[i];
+				console.log(p.name)
+			}
+		}, 'json'
+		)
+	}
+</script>
